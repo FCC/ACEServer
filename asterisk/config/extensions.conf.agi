@@ -1,0 +1,302 @@
+[general]
+static=yes
+writeprotect=yes
+clearglobalvars=no
+
+[globals]
+CONSOLE=Console/dsp                             ; Console interface for demo
+IAXINFO=guest                                   ; IAXtel username/password
+TRUNK=DAHDI/G2                                  ; Trunk interface
+TRUNKMSD=1                                      ; MSD digits to strip (usually 1 or 0)
+
+;/////////////////////////////////////////////////////////////////
+;/////////////      ACE Connect Lite      ///////////////////////
+;///////////////////////////////////////////////////////////////
+
+[from-internal]
+
+exten => _50XX,1,Dial(SIP/${EXTEN})
+        same => n,DumpChan()
+        same => n,HangUp()
+
+exten => _6XXX,1,Dial(SIP/${EXTEN})
+        same => n,DumpChan()
+        same => n,HangUp()
+
+exten => _70XX,1,Dial(SIP/${EXTEN})
+        same => n,DumpChan()
+        same => n,HangUp()
+
+exten => _NTLTesterXXX,1,Dial(SIP/${EXTEN})
+        same => n,DumpChan()
+        same => n,HangUp()
+
+exten => _ntltesterX[a-z],1,Dial(SIP/${EXTEN})
+        same => n,DumpChan()
+        same => n,HangUp()
+
+;exten => ntltester3b,1,Dial(SIP/ntltester3b)
+;        same => n,DumpChan()
+;        same => n,HangUp()
+
+exten => _7032935832,1,Dial(SIP/7032935832,10)
+	same => n,DumpChan()
+	same => n,Goto(from-internal,usermail,1)
+	same => n,HangUp()
+   
+exten => _7032935030,1,Dial(SIP/7032935030,10)
+	same => n,DumpChan()
+	same => n,Goto(from-internal,usermail,1)
+	same => n,HangUp()
+
+exten => 7777,1,Answer()
+	same => n,Wait(5)
+	same => n,Record(vm-0%d:ulaw)
+exten => 7778,1,Playback(vm-introsplash0)
+
+;Users voicemail
+exten => usermail,1,Answer()
+   same => n,BackGround(vm-introsplash0)
+   same => n,GotoIf($["${DIALSTATUS}" = "BUSY"]?busy:unavail)
+   same => n(unavail),VoiceMail(${CALLERID(dnid)}@from-phones,u)
+   same => n,Hangup()
+   same => n(busy),VoiceMail(${CALLERID(dnid)}@from-phones,b)
+   same => n,Hangup()
+
+;Direct call to a CA, this will eventually be directly to a queue
+	;exten => agents,1,Dial(SIP/6001)
+	exten => agents,1,Answer()
+	same => n,DumpChan()
+        same => n,Playback(moh14)
+        same => n,Queue(InboundQueue)
+        same => n,DumpChan()
+ 	same => n,HangUp()
+
+;ENUM Lookup to route call
+exten => _XXXXXXXXXX,1,NoOp("Caller ID: ${CALLERID(number)}")
+	same => n,DumpChan()
+	same => n,Dial(SIP/twilio0/+1${EXTEN})
+	;same => n,Set(sipuri=${ENUMLOOKUP(+1${EXTEN},sip,,1,itrs.us)})
+        ;same => n,NoOp("number: ${EXTEN} has sipuri: ${sipuri}")
+        ;If a blank URI this is a hearing user, direct to a CA => n,GotoIf($["${sipuri}" = "" ]?from-internal,agents,1)
+        ;same => n,GotoIf($["${sipuri}" = "" ]?from-internal,agents,1)
+        ;else do a direct dial
+        ;same => n,AGI(itrslookup.sh,${EXTEN})
+        ;same => n,NoOp("number: ${EXTEN} has SVR record uri: ${uri}")
+        ;same => n,Dial(SIP/${sipuri:2},5)
+        ;same => n,Dial(SIP/+1${EXTEN}::::tcp@${uri},5)
+        ;same => n,DumpChan()
+        ;same => n,HangUp()
+
+;       ;else do a direct dial
+;        same => n,Dial(SIP/${sipuri:1},30)
+;        same => n,DumpChan()
+;        same => n,HangUp()
+
+;voicemail access
+exten => 999,1,Playback(vm-acl-intro2)
+	same => n,VoiceMailMain(${CALLERID(num)}@from-phones)
+
+exten => 997,1,Answer()
+	same => n,Wait(5)
+	same => n,Record(vm-pm%d:ulaw)
+
+
+[from-providers]
+
+exten => _7032935832,1,Dial(SIP/7032935832)
+;exten => _XX7032935832,1,Dial(SIP/7032935832)
+;exten => _[+].17032935832,1,Dial(SIP/7032935832)
+	same => n,DumpChan()
+	same => n,Goto(from-internal,usermail,1)
+	same => n,HangUp()
+
+exten => _7032935030,1,Dial(SIP/7032935030)
+;exten => _XX7032935030,1,Dial(SIP/7032935030)
+;exten => _[+].17032935030,1,Dial(SIP/7032935030)
+	same => n,DumpChan()
+	same => n,Goto(from-internal,usermail,1)
+	same => n,HangUp()
+
+
+;exten => _1XXX,1,Dial(SIP/${EXTEN})
+;        same => n,DumpChan()
+;        same => n,HangUp()
+		
+;Dial Around
+exten => _7032935295,1,Answer()
+	same => n,Playback(moh14)
+        same => n,Queue(InboundQueue)
+        same => n,DumpChan()
+
+;////////////////////////////////////////////////////////////////////////
+;//////////////// IP CTS NTL CONFIG /////////////////////////////////////
+;////////////////////////////////////////////////////////////////////////	
+
+[from-twilio]
+exten => _7032935295,1,Goto(silent-ivr,s,1)
+
+;exten => _+1NXXXXXXXXX,1,Answer()
+;       same => n,Playback(moh14)
+;        same => n,Queue(InboundQueue)
+;        same => n,DumpChan()
+	;same => n,voicemail(5001@from-phones) ; no voicemain
+
+[silent-ivr]
+;exten => s,1,Answer(3)
+;	same => n,Ringing
+;	same => n,Wait(2)
+;	same => n(loop),Background(silent_audio8K)
+;	same => n,WaitExten()
+
+exten => s,1,Answer()
+;	same => n,DumpChan()
+	same => n,agi(hello.sh,en-US)
+;	same => n,Verbose(1,The text you just said is: ${utterance})
+;	same => n,Verbose(1,The probability to be right is: ${confidence})
+	same => n,Hangup()
+
+exten => 1,1,Wait(3)
+	same => n,Set(VOLUME(TX,p)=4)
+	same => n,Set(VOLUME(RX,p)=4)
+	same => n,Playback(Pizza_4_mono_Danny_DTMF7)
+	same => n,Wait(1000)
+	same => n,Hangup()
+
+exten => 2,1,Wait(3)
+	same => n,Playback(Pizza_2_mono_Dilip_test2_DTMF8)
+	same => n,Wait(1000)
+	same => n,Hangup()
+
+exten => 3,1,Wait(3)
+	same => n,Set(VOLUME(TX,p)=4)
+	same => n,Set(VOLUME(RX,p)=4)
+	same => n,Playback(DrAppt-8k-DTMF6)
+	same => n,Wait(1000)
+	same => n,Hangup()
+
+exten => 4,1,Wait(3)
+	same => n,Set(VOLUME(TX,p)=4)
+	same => n,Set(VOLUME(RX,p)=4)
+	same => n,Playback(InfoSec-t8k-DTMF9)
+	same => n,Wait(1000)
+	same => n,Hangup()
+
+exten => 5,1,Wait(3)
+	same => n,Set(VOLUME(TX,p)=4)
+	same => n,Set(VOLUME(RX,p)=5)
+	same => n,Playback(Bank_Combined_L1_DTMF_A_Final)
+	same => n,Wait(1000)
+	same => n,Hangup()
+
+exten => 6,1,Wait(4)
+	same => n,Goto(Bank_IVR_Start,s,1)
+exten => i,1,Playback(invalid)
+exten => t,1,Goto(Timeout_hangup,s,1)
+
+[Bank_IVR_Start]
+exten => s,1,Verbose(1, Caller has entered the Bank IVR)
+	same => n,Set(CORRECTNUM=1234)
+	same => n(menu),Background(Bank_S1_L1)
+	same => n,WaitExten(15)
+	same => n,Background(long_silence_final)
+	same => n,Goto(Timeout_hangup,s,1)
+exten => _XXXX,1,GotoIf($[${EXTEN}=${CORRECTNUM}]?Bank_IVR2,s,1:i,invalid)
+exten => *,1,Goto(s,menu)
+exten => i,1(invalid),Playback(invalid)
+exten => i,n,Goto(s,menu)
+exten => t,1,Goto(Timeout_hangup,s,1)
+
+[Bank_IVR2]
+exten => s,1,Verbose(1, Caller has entered phase 2 of Bank IVR)
+	same => n,Set(CORRECTPIN=2222)
+	same => n(menu),Background(Bank_S2_L1)
+	same => n,WaitExten(500)
+	same => n,Goto(Timeout_hangup,s,1)
+exten => _XXXX,1,GotoIf($[${EXTEN}=${CORRECTPIN}]?Bank_IVR3_4,s,1:i,invalid)
+exten => *,1,Goto(s,menu)
+exten => i,1(invalid),Playback(invalid)
+exten => i,n,Goto(s,menu)
+exten => t,1,Goto(Timeout_hangup,s,1)
+
+[Bank_IVR3_4]
+exten => s,1,Verbose(1, Caller has entered phase 3 of Bank IVR)
+	same => n,Playback(Bank_S3_L1)
+	same => n,Wait(3)
+
+exten => s,n,Verbose(1, Caller has entered phase 4 of Bank IVR)
+	same => n(menu),Background(Bank_S4_L1)
+	same => n,WaitExten(500)
+	same => n,Goto(Timeout_hangup,s,1)
+exten => 1,1,Wait(2)
+	same => n,Background(Bank_S4_L1)
+	same => n,WaitExten(500)
+	same => n,Goto(Timeout_hangup,s,1)
+;exten => n,Goto(s,menu)
+exten => 2,1,Goto(Bank_IVR5,s,1)
+exten => *,1,Goto(s,menu)
+exten => i,1(invalid),Playback(invalid)
+exten => i,n,Goto(s,menu)
+exten => t,1,Goto(Timeout_hangup,s,1)
+
+[Bank_IVR5]
+exten => s,1,Verbose(1, Caller has entered phase 5 of Bank IVR)
+	same => n,Playback(Bank_S5_L1)
+	same => n,Wait(30)
+	same => n,Goto(extra_delay,s,1)
+;	same => n,Goto(Timeout_hangup,s,1)
+;	same => n,Wait(1000)
+;	same => n,Hangup(100)
+;	same => *,Goto(s,menu
+	
+;exten => i,1,Wait(1000)
+;exten => *,1,Goto(s,menu)
+;exten => i,1,Wait(10)
+
+[Timeout_hangup]
+exten => s,1,Playback(vm-goodbye)
+	same => n,Wait(1000)	
+	same => n,Hangup()
+
+[extra_delay]
+exten => s,1,Answer()
+	same => n,Wait(10)
+	same => n,Playback(long_silence_final)
+	same => n,Goto(Timeout_hangup,s,1)
+
+;///////////////////////////////////////////////////////////////////////////////////
+;///////////////////////////////////////////////////////////////////////////////////
+;//////////////////////////////////////////////////////////////////////////////////
+
+[from-phones]
+exten => _NXXNXXXXXX,1,Set(CALLERID(all)="David" <7032935832>)
+same => n,Dial(SIP/twilio0/+1${EXTEN})
+;exten => 1,Dial(SIP/twilio0/+1${EXTEN})
+
+[outbound-CA]
+exten => _7032935030,1,Dial(SIP/7032935030,10)
+        same => n,DumpChan()
+        same => n,Goto(from-internal,usermail,1)
+        same => n,HangUp()
+
+exten => _7032935832,1,Dial(SIP/7032935832,10)
+        same => n,DumpChan()
+        same => n,Goto(from-internal,usermail,1)
+        same => n,HangUp()
+
+
+exten => _XXXXXXXXXX,1,NoOp("Caller ID: ${CALLERID(number)}")
+        same => n,Set(sipuri=${ENUMLOOKUP(+1${EXTEN},sip,,1,itrs.us)})
+        same => n,NoOp("number: ${EXTEN} has sipuri: ${sipuri}")
+        ;If a blank URI this is a hearing user, direct to a CA => n,GotoIf($["${sipuri}" = "" ]?from-internal,agents,1)
+        same => n,GotoIf($["${sipuri}" = "" ]?from-phones,${EXTEN},1)
+        ;else do a direct dial
+;        same => n,Dial(SIP/twilio0/+1${EXTEN})
+;        same => n,DumpChan()
+;        same => n,HangUp()
+
+;exten => internal,1,Dial(SIP/${EXTEN})
+;        same => n,DumpChan()
+;        same => n,HangUp()
+
+

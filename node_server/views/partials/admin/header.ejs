@@ -1,0 +1,61 @@
+<%/*
+                                 NOTICE
+
+This (software/technical data) was produced for the U. S. Government under
+Contract Number HHSM-500-2012-00008I, and is subject to Federal Acquisition
+Regulation Clause 52.227-14, Rights in Data-General. No other use other than
+that granted to the U. S. Government, or to those acting on behalf of the U. S.
+Government under that Clause is authorized without the express written
+permission of The MITRE Corporation. For further information, please contact
+The MITRE Corporation, Contracts Management Office, 7515 Colshire Drive, 
+McLean, VA 22102-7539, (703) 983-6000.
+
+                        ©2018 The MITRE Corporation.
+*/%>
+  <!-- Logo -->
+  <a href="./" class="logo">
+    <!-- mini logo for sidebar mini 50x50 pixels -->
+    <span class="logo-mini">
+      <b>AQ</b>
+    </span>
+    <!-- logo for regular state and mobile devices -->
+    <span class="logo-lg">ACE Quill</span>
+  </a>
+  <!-- Header Navbar: style can be found in header.less -->
+  <nav class="navbar navbar-static-top">
+    <!-- Sidebar toggle button-->
+    <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+      <span class="sr-only">Toggle navigation</span>
+    </a>
+    <!-- Right -->
+    <div class="navbar-custom-menu">
+      <ul class="nav navbar-nav">
+        <!-- User Account: style can be found in dropdown.less -->
+        <li class="dropdown user user-menu">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+            <img src="/images/acequill.png" class="user-image" alt="User Image">
+            <span class="hidden-xs"><%= fullname %></span>
+          </a>
+          <ul class="dropdown-menu">
+            <!-- User image -->
+            <li class="user-header">
+              <img src="/images/acequill.png" class="img-circle" alt="User Image">
+
+              <p>
+                <%= fullname %> - <%= group %>
+                <small><%= role %></small>
+              </p>
+            </li>
+            <!-- Menu Footer-->
+            <li class="user-footer">
+              <!--div class="pull-left">
+                <a href="#" class="btn btn-default btn-flat">Profile</a>
+              </div-->
+              <div class="pull-right">
+                <a href="./logout" class="btn btn-default btn-flat">Sign out</a>
+              </div>
+            </li>
+          </ul>
+      </ul>
+    </div>
+  </nav>

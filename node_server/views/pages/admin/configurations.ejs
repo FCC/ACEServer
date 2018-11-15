@@ -1,0 +1,283 @@
+<!--
+                                 NOTICE
+
+This (software/technical data) was produced for the U. S. Government under
+Contract Number HHSM-500-2012-00008I, and is subject to Federal Acquisition
+Regulation Clause 52.227-14, Rights in Data-General. No other use other than
+that granted to the U. S. Government, or to those acting on behalf of the U. S.
+Government under that Clause is authorized without the express written
+permission of The MITRE Corporation. For further information, please contact
+The MITRE Corporation, Contracts Management Office, 7515 Colshire Drive, 
+McLean, VA 22102-7539, (703) 983-6000.
+
+                        ©2018 The MITRE Corporation.
+-->
+
+<!DOCTYPE html>
+<html>
+
+<head>
+  <% include ../../partials/admin/head %>
+</head>
+
+<body class="skin-blue fixed sidebar-mini sidebar-mini-expand-feature">
+  <div class="wrapper">
+
+    <header class="main-header">
+      <% include ../../partials/admin/header %>
+    </header>
+    <!-- Left side column. contains the logo and sidebar -->
+    <aside class="main-sidebar">
+      <% include ../../partials/admin/sidebar %>
+    </aside>
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+      <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <h1>
+          Configurations
+        </h1>
+        <ol class="breadcrumb">
+          <li>
+            <a href="./">
+              <i class="fa fa-gears"></i> Settings</a>
+          </li>
+          <li class="active">Configurations</li>
+        </ol>
+      </section>
+
+      <!-- Main content -->
+      <section class="content">
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="box" id="api_post_box">
+              <div class="box-header">
+                <h3 class="box-title">STT Engine Configurations</h3>
+              </div>
+
+              <div id="configtablediv" class="box-body table-responsive">
+                <table id="configtable" class="table table-bordered table-hover" cellspacing="0" width="100%">
+                  <thead>
+                    <tr>
+                      <th class="text">Extension</th>
+                      <th class="text">Device Name</th>
+                      <th class="text">STT</th>
+                      <th class="text">Delay</th>
+                      <th class="text">Default</th>
+                      <% if (role == 'admin') { %>
+                        <th class="text">Group</th>
+                      <% } %>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% sttConfigs.forEach(function(config) {  %>
+                      <tr value="<%= config.extension %>">
+                        <td>
+                          <%= config.extension %>
+                        </td>
+                        <td>
+                          <%= config.name %>
+                        </td>
+                        <td>
+                          <%= config.stt_engine %>
+                        </td>
+                        <td>
+                          <%= config.delay %>
+                        </td>
+                        <td>
+                          <%= config.default_device %>
+                        </td>
+                        <% if (role == 'admin') { %>
+                          <td>
+                            <%= config.group_name %>
+                          </td>
+                        <% } %>
+                      </tr>
+
+                      <% }) %>
+                  </tbody>
+                </table>
+              </div>
+              <!-- /.box-body -->
+              <div class="box-footer">
+                <button type="button" class="btn btn-primary" id="add_extension_btn" onclick='addExtension()'>Add Extension</button>
+              </div>
+
+
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- Modal -->
+      <div class="modal fade" id="configModal" tabindex="-1" role="dialog" aria-labelledby="configExtension">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+              <h4 class="modal-title" id="configModalLabel">Configure Extension</h4>
+            </div>
+            <form class="form-horizontal" id="AddModifyExtensionForm">
+              <div class="modal-body">
+                <div class="form-group" id="form_extension">
+                  <label for="inputExtension" class="col-sm-3 control-label">Extension</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" id="inputExtension" placeholder="Enter Phone Extension ex. 5001" minlength="4" maxlength="4"
+                      required>
+                  </div>
+                </div>
+                <div class="form-group" id="form_device_name">
+                  <label for="inputExtension" class="col-sm-3 control-label">Device Name</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" id="inputDeviceName" placeholder="Enter a Device Name ex. Phone 1" maxlength="45"
+                      required>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="inputPassword" class="col-sm-3 control-label">STT Engine</label>
+                  <div class="col-sm-9">
+                    <select class="form-control" id="configEngine">
+                      <option value='AZURE' selected="selected">A - Microsoft Azure</option>
+                      <option value='GOOGLE'>G - Google</option>
+                      <option value='WATSON'>W - IBM Watson</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="inputFirstname" class="col-sm-3 control-label">Delay</label>
+                  <div class="col-sm-9">
+                    <input id="delaySlider" class="slider form-control" data-slider-id='red' type="text" data-slider-min="0" data-slider-max="25"
+                      data-slider-step="1" data-slider-value="0" />
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" id='loadConfig'>Save</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id='deleteOption' onclick='deleteExtension()'>Delete</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+    <footer class="main-footer">
+      <% include ../../partials/admin/footer %>
+    </footer>
+  </div>
+  <!-- ./wrapper -->
+  <!-- Socket.io -->
+  <script src='./../socket.io/socket.io.js'></script>
+  <script type="text/javascript">
+    $('#settings_treeview').addClass('active');
+    $('#settings_configurations_treeview').addClass('active');
+
+    var socket = io('/admin', {
+      path:'/socket.io'
+    });
+    socket.on('connect', function (data) {
+      socket.emit('register-admin');
+    });
+
+    $('#delaySlider').bootstrapSlider();
+
+    var selectedExtension = 0;
+
+    var table = $('#configtable').DataTable({
+      "paging": false,
+      "ordering": true,
+      "info": false,
+      "searching": false,
+      "order": [],
+      "columnDefs": [{
+        "targets": [4],
+        "visible": false,
+        "searchable": false
+      }, {
+        "targets": [0],
+        "render": function (data, type, row) {
+          if (row[4] == 1)
+            return "Default"
+          return data;
+        }
+      }, {
+        "targets": [2],
+        "render": function (data, type, row) {
+          switch (data) {
+            case 'AZURE':
+              data = 'A - Microsoft Azure';
+              break;
+            case 'GOOGLE':
+              data = 'G - Google';
+              break;
+            case 'WATSON':
+              data = 'W - IBM Watson';
+              break;
+            default:
+              data = 'Unknown';
+              console.log('Data: ' + data)
+              break;
+          }
+
+          return data;
+        }
+      }]
+    });
+
+    $('#configtable tbody').on('click', 'tr', function () {
+      var row = table.row(this).data();
+      selectedExtension = row[0];
+      if (row[4] == 1) {
+        $('#deleteOption').hide();
+        $('#inputExtension').val('Default');
+        $('#inputExtension').prop('disabled', true);
+      } else {
+        $('#deleteOption').show();
+        $('#inputExtension').prop('disabled', false);
+        $('#inputExtension').val(row[0]);
+      }
+
+      $('#inputDeviceName').val(row[1]);
+      $('#configEngine').val(row[2]);
+      $('#delaySlider').bootstrapSlider('setValue', parseInt(row[3]));
+
+      $('#configModal').modal();
+    });
+
+    $("#AddModifyExtensionForm").submit(function (event) {
+      event.preventDefault();
+      $.post("./UpdateConfig", {
+          "extension": $('#inputExtension').val(),
+          "name": $('#inputDeviceName').val(),
+          "stt_engine": $('#configEngine').val(),
+          "delay": $('#delaySlider').bootstrapSlider('getValue')
+        },
+        function (data, status) {
+          console.log("Saved!!!!")
+          location.reload();
+        });
+    });
+
+    function addExtension() {
+      $("#addExtensionForm").trigger("reset");
+      $('#configModal').modal();
+    }
+
+    function deleteExtension() {
+      $.post("./DeleteConfig", {
+          "extension": $('#inputExtension').val()
+        },
+        function (data, status) {
+          console.log("Deleted!!!!")
+          location.reload();
+        });
+    }
+  </script>
+</body>
+
+</html>

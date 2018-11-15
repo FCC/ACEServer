@@ -1,0 +1,90 @@
+<%/*
+                                 NOTICE
+
+This (software/technical data) was produced for the U. S. Government under
+Contract Number HHSM-500-2012-00008I, and is subject to Federal Acquisition
+Regulation Clause 52.227-14, Rights in Data-General. No other use other than
+that granted to the U. S. Government, or to those acting on behalf of the U. S.
+Government under that Clause is authorized without the express written
+permission of The MITRE Corporation. For further information, please contact
+The MITRE Corporation, Contracts Management Office, 7515 Colshire Drive, 
+McLean, VA 22102-7539, (703) 983-6000.
+
+                        ©2018 The MITRE Corporation.
+*/%>
+  <!-- sidebar -->
+  <section class="sidebar">
+    <ul class="sidebar-menu" data-widget="tree">
+      <li class="header">Navigation</li>
+      <li id="settings_treeview" class="treeview">
+        <a href="#">
+          <i class="fa fa-gears"></i>
+          <span>Settings</span>
+          <span class="pull-right-container">
+            <i class="fa fa-angle-left pull-right"></i>
+          </span>
+        </a>
+        <ul class="treeview-menu">
+          <li id="settings_configurations_treeview">
+            <a href="./configs">
+              <i class="fa fa-circle-o"></i>Configurations</a>
+          </li>
+          <li id="settings_stt_engines_treeview">
+            <a href="./stt_engines">
+              <i class="fa fa-circle-o"></i>STT Engines</a>
+          </li>
+        </ul>
+      </li>
+      <li id="reports_treeview" class="treeview">
+        <a href="#">
+          <i class="fa fa-bar-chart"></i>
+          <span>Reports</span>
+          <span class="pull-right-container">
+            <i class="fa fa-angle-left pull-right"></i>
+          </span>
+        </a>
+        <ul class="treeview-menu">
+          <li id="reports_cdr_treeview">
+            <a href="./cdr">
+              <i class="fa fa-circle-o"></i>CDR</a>
+          </li>
+          <li id="reports_research_data_treeview">
+            <a href="./research_data">
+              <i class="fa fa-circle-o"></i> Research Data</a>
+          </li>
+        </ul>
+      </li>
+      <% if (role == 'admin') { %>
+        <li id="admin_treeview" class="treeview">
+          <a href="#">
+            <i class="fa fa-lock"></i>
+            <span>Administrator</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li id="admin_groups_treeview">
+              <a href="./groups">
+                <i class="fa fa-circle-o"></i>
+                <span>Group Management</span>
+              </a>
+            </li>
+            <li id="admin_servertest_treeview">
+              <a href="./servertest">
+                <i class="fa fa-circle-o"></i>
+                <span>Server Test</span>
+              </a>
+            </li>
+            <li id="admin_users_treeview">
+              <a href="./users">
+                <i class="fa fa-circle-o"></i>
+                <span>User Management</span>
+              </a>
+            </li>
+          </ul>
+        </li>
+        <% } %>
+    </ul>
+  </section>
+  <!-- /.sidebar -->

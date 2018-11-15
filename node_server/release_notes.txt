@@ -1,0 +1,6 @@
+
+
+4/25
+- Build 2005, android-debug-6Apr-v2.apk
+- Includes the UI changes related to changing the name from IP CTS to
+  ACE Quill

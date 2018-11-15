@@ -1,0 +1,153 @@
+#!/usr/bin/env node
+
+/*
+                                 NOTICE
+
+This (software/technical data) was produced for the U. S. Government under
+Contract Number HHSM-500-2012-00008I, and is subject to Federal Acquisition
+Regulation Clause 52.227-14, Rights in Data-General. No other use other than
+that granted to the U. S. Government, or to those acting on behalf of the U. S.
+Government under that Clause is authorized without the express written
+permission of The MITRE Corporation. For further information, please contact
+The MITRE Corporation, Contracts Management Office, 7515 Colshire Drive, 
+McLean, VA 22102-7539, (703) 983-6000.
+
+                        ©2018 The MITRE Corporation.
+*/
+
+/**
+ * Module dependencies.
+ */
+var debug = require('debug')('init:server');
+var https = require('https');
+var fs = require('fs');
+var nconf = require('nconf');
+var io = require('socket.io');
+var log4js = require('log4js');
+
+// Get the name of the config file from the command line (optional)
+nconf.argv().env();
+cfile = 'config.json';
+
+// Validate the incoming JSON config file
+try {
+  var content = fs.readFileSync(cfile, 'utf8');
+  var myjson = JSON.parse(content);
+  console.log("Valid JSON config file");
+} catch (ex) {
+  console.log("Error in " + cfile);
+  console.log('Exiting...');
+  console.log(ex);
+  process.exit(1);
+}
+
+nconf.file({
+  file: cfile
+});
+
+log4js.loadAppender('file');
+log4js.configure({
+  appenders: [{
+    type: 'dateFile',
+    category: 'admin',
+    filename: 'logs/admin.log',
+    pattern: '-yyyy-MM-dd',
+    alwaysIncludePattern: false,
+    maxLogSize: 20480,
+    backups: 10
+  }, {
+    type: 'dateFile',
+    category: 'caller',
+    filename: 'logs/caller.log',
+    pattern: '-yyyy-MM-dd',
+    alwaysIncludePattern: false,
+    maxLogSize: 20480,
+    backups: 10
+  }, {
+    type: 'dateFile',
+    category: 'asterisk',
+    filename: 'logs/asterisk.log',
+    pattern: '-yyyy-MM-dd',
+    alwaysIncludePattern: false,
+    maxLogSize: 20480,
+    backups: 10
+  }]
+});
+
+
+/**
+ * Get port from environment and store in Express.
+ */
+var decode = require('./../utils/decode');
+var app = require('../app');
+var port = decode(nconf.get('port'));
+app.set('port', port);
+
+/**
+ * Create HTTP server.
+ */
+console.log("Listening for HTTPS connections");
+var credentials = {
+  key: fs.readFileSync(decode(nconf.get('ssl:key'))),
+  cert: fs.readFileSync(decode(nconf.get('ssl:cert')))
+};
+var server = https.createServer(credentials, app);
+
+
+var io = require('socket.io').listen(server);
+require('../sockets/admin')(io.of('/admin'), nconf);
+
+if (decode(nconf.get('sttService')) === 'enabled') {
+  require('../asterisk');
+} else {
+  console.log('STT Service is currently DISABLED. This allows the ACE Quill web server to be run without including the STT node_modules.');
+}
+
+
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  var bind = typeof port === 'string' ?
+    'Pipe ' + port :
+    'Port ' + port;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListening() {
+  var addr = server.address();
+  var bind = typeof addr === 'string' ?
+    'pipe ' + addr :
+    'port ' + addr.port;
+  console.log("Listening on port: " + bind);
+}

@@ -1,0 +1,27 @@
+{
+  "name": "bower",
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "AdminLTE": "adminlte#^2.3.6",
+    "bootstrap": "3.3.7",
+    "moment": "2.15.1",
+    "font-awesome": "4.6.0",
+    "bootstrap-daterangepicker": "2.1.24",
+    "datatables.net-jqui": "2.1.1",
+    "jquery-form-validator": "2.3.77"
+  },
+  "resolutions": {
+    "font-awesome": "4.7.0",
+    "jquery": "3.2.1"
+  }
+}

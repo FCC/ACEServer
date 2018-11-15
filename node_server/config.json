@@ -1,0 +1,32 @@
+{
+    "cleartext": true,
+    "debuglevel": "ALL",
+    "port": 8005,
+    "version": "1.0",
+    "proxy":"http://0.0.0.0:1234",
+    "sttService": "enabled",
+    "ssl" : {
+      "key": "/path/to/ssl/key",
+      "cert": "/path/to/ssl/cert"
+    },
+    "session": {
+      "name":"acequillSessionName",
+      "secret": "acequillSessionSecretPhrase"
+    },
+    "transcriptFilePath": "/path/to/store/transcripts/",
+    "wavFilePath": "/path/to/store/wav/files/",
+    "videoFilePath":"path/to/store/video/uploads/",
+    "mysql": {
+      "host": "127.0.0.1",
+      "user": "user",
+      "password": "password",
+      "database": "database_name"
+    },
+    "asterisk": {
+      "port": 5038,
+      "host": "127.0.0.1",
+      "user": "managerAcct",
+      "password": "managerPassword"
+    }
+}
+  
